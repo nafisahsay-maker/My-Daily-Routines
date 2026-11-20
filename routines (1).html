@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fill in the Blank: My Daily Routines</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@500;700&display=swap">
+<style>
+:root{--bg:#ffe3c2;--card:#fff8ef;--ink:#2b2a4c;--muted:#6a5f78;--accent:#ff7a45;--ok:#1f9d6b;--okbg:#d5f3e5;--bad:#d6334f;--badbg:#fbdbe0;--line:#f0c99c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#241f3a;--card:#322b4f;--ink:#fff1e0;--muted:#c3b5d6;--accent:#ff9466;--ok:#5fe0ae;--okbg:#1d4a3d;--bad:#ff8aa0;--badbg:#5a2638;--line:#4c4372}}
+:root[data-theme="dark"]{--bg:#241f3a;--card:#322b4f;--ink:#fff1e0;--muted:#c3b5d6;--accent:#ff9466;--ok:#5fe0ae;--okbg:#1d4a3d;--bad:#ff8aa0;--badbg:#5a2638;--line:#4c4372}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito",system-ui,sans-serif;font-size:18px;line-height:1.5;min-height:100vh}
+main{max-width:640px;margin:0 auto;padding:20px 16px 40px}
+h1{font-family:"Baloo 2",system-ui,sans-serif;font-weight:800;font-size:clamp(30px,7vw,44px);line-height:1.05;margin:8px 0 4px}
+.sub{color:var(--muted);margin:0 0 18px}
+.bar{height:12px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:6px}
+.bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .3s}
+.meta{display:flex;justify-content:space-between;color:var(--muted);font-weight:700;font-size:15px;margin-bottom:14px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:22px 20px}
+.sentence{font-family:"Baloo 2",system-ui,sans-serif;font-weight:600;font-size:clamp(22px,5.2vw,28px);line-height:1.35;margin:0 0 20px}
+.blank{display:inline-block;min-width:110px;border-bottom:4px dashed var(--accent);text-align:center;padding:0 8px;color:var(--accent)}
+.blank.ok{border-bottom:4px solid var(--ok);color:var(--ok)}
+.blank.bad{border-bottom:4px solid var(--bad);color:var(--bad)}
+.opts{display:grid;gap:10px}
+.opt{font:inherit;font-weight:700;text-align:left;padding:14px 16px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.opt.ok{background:var(--okbg);border-color:var(--ok)}
+.opt.bad{background:var(--badbg);border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.fb{margin-top:16px;padding:14px 16px;border-radius:14px;font-weight:700}
+.fb.ok{background:var(--okbg);color:var(--ink)}
+.fb.bad{background:var(--badbg);color:var(--ink)}
+.fb small{display:block;font-weight:500;color:var(--muted);margin-top:2px}
+.btn{font:inherit;font-weight:800;margin-top:16px;padding:14px 22px;border:0;border-radius:99px;background:var(--accent);color:#2b1608;cursor:pointer}
+.big{font-family:"Baloo 2",system-ui,sans-serif;font-weight:800;font-size:56px;line-height:1;margin:4px 0}
+ul.miss{padding-left:20px;margin:10px 0 0}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>My Daily Routines</h1>
+<p class="sub">Choose the word or phrase that fits the blank.</p>
+
+<section id="play">
+  <div class="bar"><i id="fill"></i></div>
+  <div class="meta"><span id="count"></span><span id="score"></span></div>
+  <div class="card">
+    <p class="sentence" id="sentence"></p>
+    <div class="opts" id="opts"></div>
+    <div class="fb" id="fb" hidden></div>
+    <button class="btn" id="next" hidden></button>
+  </div>
+</section>
+
+<section id="end" hidden>
+  <div class="card">
+    <p class="sub" style="margin:0">Your score</p>
+    <p class="big" id="final"></p>
+    <p id="msg" style="font-weight:700"></p>
+    <div id="review"></div>
+    <button class="btn" id="again">Play again</button>
+  </div>
+</section>
+</main>
+
+<script>
+var Q=[
+{s:"James is a(n) ___. He wakes up with the sun at 5 a.m. every day and loves mornings.",a:"early bird",o:["night owl","workaholic"],h:"Early bird = bangun pagi sekali, “bangun bersama matahari”."},
+{s:"Don’t talk to Lany before breakfast. She is a total ___.",a:"morning monster",o:["early bird","workaholic"],h:"Morning monster = orang yang sulit diajak bicara tepat setelah bangun tidur."},
+{s:"I ___ on my reading every Sunday because I’m busy during the week.",a:"catch up",o:["hang out","pig out","put off"],h:"Catch up on = mengejar hal yang belum sempat dikerjakan."},
+{s:"Lany ___ every Monday, so she is always late for class.",a:"oversleeps",o:["hits the sack","works out","picks up"],h:"Oversleep = tidur lebih lama dari waktu yang direncanakan."},
+{s:"After class, James and his friends usually ___ at the café.",a:"hang out",o:["work out","put off","pick up"],h:"Hang out = menghabiskan waktu santai bersama teman."},
+{s:"James always ___ on fried chicken at parties.",a:"pigs out",o:["hangs out","works out","picks up"],h:"Pig out = makan berlebihan."},
+{s:"Lany ___ at the gym every Monday and Thursday.",a:"works out",o:["pigs out","hangs out","puts off"],h:"Work out = berolahraga."},
+{s:"At 10 p.m., Lany usually ___ because she wakes up early.",a:"hits the sack",o:["pigs out","works out","stays up late"],h:"Hit the sack = (informal) pergi tidur."},
+{s:"He answers emails at midnight and on Sundays. He is a ___.",a:"workaholic",o:["early bird","morning monster","lazy person"],h:"Workaholic = orang yang bekerja secara kompulsif, tanpa jeda."},
+{s:"Lazy students always ___ their homework until the last minute.",a:"put off",o:["pick up","catch up","hang out"],h:"Put off = menunda sesuatu ke waktu yang lebih lambat."},
+{s:"Every new employee ___ during the first month at work.",a:"learns the ropes",o:["hits the sack","pigs out","catches up"],h:"Learn the ropes = mulai terbiasa dengan pekerjaan atau rutinitas baru."},
+{s:"Lany ___ Korean easily just by watching dramas.",a:"picks up",o:["puts off","works out","hangs out"],h:"Pick up = mempelajari keterampilan atau bahasa dengan mudah."}
+];
+function $(i){return document.getElementById(i)}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+var deck,idx,score,missed,locked;
+function start(){deck=shuffle(Q).slice(0,10);idx=0;score=0;missed=[];$("end").hidden=true;$("play").hidden=false;show()}
+function show(){
+  var q=deck[idx];locked=false;
+  $("count").textContent="Question "+(idx+1)+" of "+deck.length;
+  $("score").textContent="Score: "+score;
+  $("fill").style.width=(idx/deck.length*100)+"%";
+  var parts=q.s.split("___");
+  $("sentence").innerHTML=parts[0]+'<span class="blank" id="blank">&nbsp;</span>'+parts[1];
+  var box=$("opts");box.innerHTML="";
+  shuffle([q.a].concat(q.o)).forEach(function(t){
+    var b=document.createElement("button");b.className="opt";b.type="button";b.textContent=t;
+    b.onclick=function(){pick(b,t)};box.appendChild(b)});
+  $("fb").hidden=true;$("next").hidden=true;
+}
+function pick(btn,t){
+  if(locked)return;locked=true;
+  var q=deck[idx],ok=(t===q.a),bl=$("blank");
+  bl.textContent=q.a;bl.className="blank "+(ok?"ok":"bad");
+  Array.prototype.forEach.call($("opts").children,function(b){
+    b.disabled=true;if(b.textContent===q.a)b.classList.add("ok")});
+  if(!ok){btn.classList.add("bad");missed.push(q)}else score++;
+  $("score").textContent="Score: "+score;
+  var fb=$("fb");fb.hidden=false;fb.className="fb "+(ok?"ok":"bad");
+  fb.innerHTML=(ok?"Correct!":"Not quite. The answer is “"+q.a+"”.")+"<small>"+q.h+"</small>";
+  var n=$("next");n.hidden=false;n.textContent=(idx===deck.length-1)?"See my score":"Next question";n.focus();
+}
+$("next").onclick=function(){idx++;if(idx>=deck.length)finish();else show()};
+function finish(){
+  $("play").hidden=true;$("end").hidden=false;
+  $("final").textContent=score+" / "+deck.length;
+  var p=score/deck.length;
+  $("msg").textContent=p===1?"Perfect! You really know your routines.":p>=0.7?"Great job! Just a few phrases to review.":p>=0.4?"Good start. Review the phrases below and try again.":"Keep practicing. Read the vocabulary list once more, then play again.";
+  var r=$("review");r.innerHTML="";
+  if(missed.length){
+    var h='<p style="margin:14px 0 0;font-weight:800">Review these:</p><ul class="miss">';
+    missed.forEach(function(q){h+="<li><b>"+q.a+"</b>: "+q.h.replace(/^[^=]*=\s*/,"")+"</li>"});
+    r.innerHTML=h+"</ul>";
+  }
+}
+$("again").onclick=start;
+start();
+</script>
+</body>
+</html>
